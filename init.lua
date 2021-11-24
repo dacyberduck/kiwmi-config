@@ -11,6 +11,7 @@ WS = {
 }
 WSCUR = 1
 WSPRV = 1
+LAYOUT = 1 -- 1 = tile, 0 = monocle
 
 OUTPUT = false
 CURSOR = kiwmi:cursor()
@@ -18,16 +19,21 @@ CURSOR = kiwmi:cursor()
 local _modstate
 local _view = require('kiwmi.view')
 local _wrksp = require('kiwmi.workspace')
+local _lt = require('kiwmi.layout')
 
 local keybinds = {
   -- super -- -- alt -- -- ctrl -- -- shift -- -- -- key -- -- -- action --
   { false,      true,     false,      false,        'Return',   function() kiwmi:spawn("alacritty") end },
   { false,      true,     false,      false,        'p',        function() kiwmi:spawn("kickoff") end },
   { false,      true,     false,      true,         'q',        function() kiwmi:quit() end },
-  { false,      true,     false,      false,        'q',        function() kiwmi:focused_view():close() end },
+  { false,      true,     false,      false,        'q',        function() local v = kiwmi:focused_view() if v then v:close() end end },
 
   { false,      true,     false,      false,        'Tab',      function() _view:focusViewNext(kiwmi:focused_view()) end },
   { false,      true,     false,      true,         'Tab',      function() _view:focusViewPrev(kiwmi:focused_view()) end },
+
+  { false,      true,     false,      false,        'm',        function() _lt:layout_monocle() end },
+  { false,      true,     false,      false,        't',        function() _lt:layout_tile() end },
+  { false,      true,     false,      true,         'Return',   function() _lt:layout_last() end },
 
   { false,      true,     false,      false,        '1',        function() _wrksp:showWorkspace(1) end },
   { false,      true,     false,      false,        '2',        function() _wrksp:showWorkspace(2) end },
