@@ -18,4 +18,8 @@ function M:showWorkspace(id)
   OUTPUT:redraw()
 end
 
+function M:showLastWorkspace()
+  self:showWorkspace(WSPRV)
+end
+
 return M

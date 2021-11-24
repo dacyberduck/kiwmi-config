@@ -32,6 +32,7 @@ local keybinds = {
   { false,      true,     false,      false,        '1',        function() _wrksp:showWorkspace(1) end },
   { false,      true,     false,      false,        '2',        function() _wrksp:showWorkspace(2) end },
   { false,      true,     false,      false,        '3',        function() _wrksp:showWorkspace(3) end },
+  { false,      true,     true,       false,        'Tab',      function() _wrksp:showLastWorkspace() end },
 }
 
 kiwmi:on("output", function(output)
