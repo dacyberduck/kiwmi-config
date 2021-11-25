@@ -1,4 +1,5 @@
 local M = {}
+local _lt = require('kiwmi.layout')
 
 function M:getViewPos(view)
   for i,j in ipairs(WS[WSCUR]) do
@@ -60,6 +61,13 @@ end
 function M:focusViewMaster()
   if #WS[WSCUR] < 2 or kiwmi:focused_view() == WS[WSCUR][1] then return end
   self:focusView(WS[WSCUR][1])
+end
+
+function M:switchViewMaster(view)
+  if #WS[WSCUR] < 2 then return end
+  i = self:getViewPos(view)
+  WS[WSCUR][i],WS[WSCUR][1] = WS[WSCUR][1],WS[WSCUR][i]
+  _lt:arrange_layout()
 end
 
 return M

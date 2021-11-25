@@ -15,10 +15,10 @@ function M:layout_tile()
   else
     local vx,vy,vw,vh
     for i,j in ipairs(WS[WSCUR]) do
-      vx = i == 1 and o.x+BWIDTH or o.x+self:ROUND(o.width*MWIDTH)+BWIDTH
-      vy = i == 1 and o.y+BWIDTH or o.y+self:ROUND(o.height/(n-1))*(i-2)+BWIDTH
-      vw = i == 1 and self:ROUND(o.width*MWIDTH)-2*BWIDTH or o.width-self:ROUND(o.width*MWIDTH)-2*BWIDTH
-      vh = i == 1 and o.height-2*BWIDTH or self:ROUND(o.height/(n-1))-2*BWIDTH
+      vx = i <= MCOUNT and o.x+BWIDTH or o.x+self:ROUND(o.width*MWIDTH)+BWIDTH
+      vy = i <= MCOUNT and o.y+self:ROUND(o.height/MCOUNT)*(i-1)+BWIDTH or o.y+self:ROUND(o.height/(n-MCOUNT))*(i-(MCOUNT+1))+BWIDTH
+      vw = i <= MCOUNT and self:ROUND(o.width*MWIDTH)-2*BWIDTH or o.width-self:ROUND(o.width*MWIDTH)-2*BWIDTH
+      vh = i <= MCOUNT and self:ROUND(o.height/MCOUNT)-2*BWIDTH or self:ROUND(o.height/(n-MCOUNT))-2*BWIDTH
       j:move(vx,vy)
       j:resize(vw,vh)
     end
@@ -46,13 +46,23 @@ function M:arrange_layout()
   end
 end
 
-function M:cycle_layout_next()
-  LAYOUT = LAYOUT <= 2 and LAYOUT+1 or 1
+function M:incMasterWidth()
+  MWIDTH = MWIDTH < 0.75 and MWIDTH+0.05 or 0.75
   self:arrange_layout()
 end
 
-function M:cycle_layout_prev()
-  LAYOUT = LAYOUT == 1 and 3 or LAYOUT-1
+function M:decMasterWidth()
+  MWIDTH = MWIDTH > 0.25 and MWIDTH-0.05 or 0.25
+  self:arrange_layout()
+end
+
+function M:incMasterCount()
+  MCOUNT = MCOUNT+1
+  self:arrange_layout()
+end
+
+function M:decMasterCount()
+  MCOUNT = MCOUNT<=1 and 1 or MCOUNT-1
   self:arrange_layout()
 end
 

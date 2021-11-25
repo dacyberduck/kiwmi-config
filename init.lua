@@ -1,6 +1,4 @@
 MODKEY = "Alt_L"
-BWIDTH = 2
-MWIDTH = 0.5
 COLORS = { "#4dc653", "#2d4654" }
 WS = {
   [1]   = {},
@@ -11,6 +9,9 @@ WS = {
 }
 WSCUR = 1
 WSPRV = 1
+BWIDTH = 2
+MWIDTH = 0.5
+MCOUNT = 1
 LAYOUT = 1 -- 1 = tile, 2 = monocle, anything else = floating
 
 OUTPUT = false
@@ -32,11 +33,16 @@ local keybinds = {
   { false,      true,     false,      true,         'Tab',      function() _view:focusViewPrev(kiwmi:focused_view()) end },
 
   { false,      true,     false,      false,        'm',        function() _view:focusViewMaster() end },
+  { false,      true,     false,      true,         'm',        function() _view:switchViewMaster(kiwmi:focused_view()) end },
+
+  { false,      true,     false,      true,         'h',        function() _lt:decMasterWidth() end },
+  { false,      true,     false,      true,         'l',        function() _lt:incMasterWidth() end },
+  { false,      true,     false,      true,         'j',        function() _lt:decMasterCount() end },
+  { false,      true,     false,      true,         'k',        function() _lt:incMasterCount() end },
 
   { false,      true,     false,      false,        't',        function() _lt:layout_tile() end },
   { false,      true,     false,      true,         't',        function() _lt:layout_monocle() end },
-  { false,      true,     true,       false,        't',        function() LAYOUT = 3 end }, -- TODO: floating layout
-  { false,      true,     true,       true,         't',        function() _lt:cycle_layout_next() end },
+  { false,      true,     false,      true,         'Return',   function() _lt:arrange_layout() end },
 
   { false,      true,     false,      false,        '1',        function() _wrksp:showWorkspace(1) end },
   { false,      true,     false,      false,        '2',        function() _wrksp:showWorkspace(2) end },
@@ -86,12 +92,10 @@ end)
 kiwmi:on("view", function(view)
   _view:addView(view)
   _view:focusView(view)
-  _lt:arrange_layout()
-  -- view:move(50,50)
+  view:move(100,100)
 
   view:on("destroy", function(view)
     _view:removeView(view)
-    _lt:arrange_layout()
   end)
 
   view:on("pre_render", function(ev)
