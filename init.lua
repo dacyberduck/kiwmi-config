@@ -11,7 +11,7 @@ WS = {
 }
 WSCUR = 1
 WSPRV = 1
-LAYOUT = 1 -- 1 = tile, 0 = monocle
+LAYOUT = 1 -- 1 = tile, 2 = monocle, anything else = floating
 
 OUTPUT = false
 CURSOR = kiwmi:cursor()
@@ -31,9 +31,12 @@ local keybinds = {
   { false,      true,     false,      false,        'Tab',      function() _view:focusViewNext(kiwmi:focused_view()) end },
   { false,      true,     false,      true,         'Tab',      function() _view:focusViewPrev(kiwmi:focused_view()) end },
 
-  { false,      true,     false,      false,        'm',        function() _lt:layout_monocle() end },
+  { false,      true,     false,      false,        'm',        function() _view:focusViewMaster() end },
+
   { false,      true,     false,      false,        't',        function() _lt:layout_tile() end },
-  { false,      true,     false,      true,         'Return',   function() _lt:layout_last() end },
+  { false,      true,     false,      true,         't',        function() _lt:layout_monocle() end },
+  { false,      true,     true,       false,        't',        function() LAYOUT = 3 end }, -- TODO: floating layout
+  { false,      true,     true,       true,         't',        function() _lt:cycle_layout_next() end },
 
   { false,      true,     false,      false,        '1',        function() _wrksp:showWorkspace(1) end },
   { false,      true,     false,      false,        '2',        function() _wrksp:showWorkspace(2) end },
@@ -83,10 +86,12 @@ end)
 kiwmi:on("view", function(view)
   _view:addView(view)
   _view:focusView(view)
-  view:move(50,50)
+  _lt:arrange_layout()
+  -- view:move(50,50)
 
   view:on("destroy", function(view)
     _view:removeView(view)
+    _lt:arrange_layout()
   end)
 
   view:on("pre_render", function(ev)

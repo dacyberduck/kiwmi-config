@@ -57,4 +57,9 @@ function M:focusViewPrev(view)
   end
 end
 
+function M:focusViewMaster()
+  if #WS[WSCUR] < 2 or kiwmi:focused_view() == WS[WSCUR][1] then return end
+  self:focusView(WS[WSCUR][1])
+end
+
 return M

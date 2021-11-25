@@ -2,17 +2,6 @@ local M = {}
 
 function M:ROUND(x) return math.floor(x+0.5) end
 
-function M:layout_monocle()
-  if #WS[WSCUR] < 1 then return end
-  local o = OUTPUT:usable_area()
-  for _,v in ipairs(WS[WSCUR]) do
-    v:move(o.x+BWIDTH,o.y+BWIDTH)
-    v:resize(o.width-2*BWIDTH,o.height-2*BWIDTH)
-  end
-  OUTPUT:redraw()
-  LAYOUT = 0
-end
-
 function M:layout_tile()
   local n = #WS[WSCUR]
   if n < 1 then return end
@@ -38,9 +27,33 @@ function M:layout_tile()
   LAYOUT = 1
 end
 
-function M:layout_last()
-  if LAYOUT == 1 then self:layout_tile() end
-  if LAYOUT == 0 then self:layout_monocle() end
+function M:layout_monocle()
+  if #WS[WSCUR] < 1 then return end
+  local o = OUTPUT:usable_area()
+  for _,v in ipairs(WS[WSCUR]) do
+    v:move(o.x+BWIDTH,o.y+BWIDTH)
+    v:resize(o.width-2*BWIDTH,o.height-2*BWIDTH)
+  end
+  OUTPUT:redraw()
+  LAYOUT = 2
+end
+
+function M:arrange_layout()
+  if LAYOUT == 1 then
+    self:layout_tile()
+  elseif LAYOUT == 2 then
+    self:layout_monocle()
+  end
+end
+
+function M:cycle_layout_next()
+  LAYOUT = LAYOUT <= 2 and LAYOUT+1 or 1
+  self:arrange_layout()
+end
+
+function M:cycle_layout_prev()
+  LAYOUT = LAYOUT == 1 and 3 or LAYOUT-1
+  self:arrange_layout()
 end
 
 return M
