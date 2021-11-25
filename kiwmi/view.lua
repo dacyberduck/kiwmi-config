@@ -1,5 +1,12 @@
 local M = {}
-M.fs = {}
+
+M.fs = {
+  s = false,
+  x = 0,
+  y = 0,
+  w = 0,
+  h = 0,
+}
 
 local _lt = require('kiwmi.layout')
 
@@ -145,16 +152,16 @@ end
 -- toggle fullscreen on a view
 function M:toggleViewFullscreen(view)
   if not view then return end
-  if self.fs[view] then
-    view:move(self.fs[view].x,self.fs[view].y)
-    view:resize(self.fs[view].w,self.fs[view].h)
-    self.fs[view] = nil
+  if self.fs.s then
+    view:move(self.fs.x,self.fs.y)
+    view:resize(self.fs.w,self.fs.h)
+    self.fs.s = false
   else
-    self.fs[view] = {}
-    self.fs[view].x,self.fs[view].y = view:pos()
-    self.fs[view].w,self.fs[view].h = view:size()
+    self.fs.x,self.fs.y = view:pos()
+    self.fs.w,self.fs.h = view:size()
     view:move(OUTPUT:pos())
     view:resize(OUTPUT:size())
+    self.fs.s = true
   end
   OUTPUT:redraw()
 end
