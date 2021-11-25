@@ -21,8 +21,8 @@ OUTPUT = false
 CURSOR = kiwmi:cursor()
 
 local _modstate
-local _view = require('kiwmi.view')
-local _lt = require('kiwmi.layout')
+local _kw = require('kiwmi')
+local _lt = require('layout')
 
 local keybinds = {
   -- super -- -- alt -- -- ctrl -- -- shift -- -- -- key -- -- -- action --
@@ -35,22 +35,22 @@ local keybinds = {
   { false,      true,     false,      true,         't',        function() _lt:layout_monocle() end },
   { false,      true,     false,      true,         'Return',   function() _lt:arrange_layout() end },
 
-  { false,      true,     false,      false,        'Tab',      function() _view:focusViewNext() end },
-  { false,      true,     false,      true,         'Tab',      function() _view:focusViewPrev() end },
+  { false,      true,     false,      false,        'Tab',      function() _kw:focusViewNext() end },
+  { false,      true,     false,      true,         'Tab',      function() _kw:focusViewPrev() end },
 
-  { false,      true,     false,      false,        'm',        function() _view:focusViewMaster() end },
-  { false,      true,     false,      true,         'm',        function() _view:switchViewMaster() end },
+  { false,      true,     false,      false,        'm',        function() _kw:focusViewMaster() end },
+  { false,      true,     false,      true,         'm',        function() _kw:switchViewMaster() end },
 
   { false,      true,     false,      true,         'h',        function() _lt:decMasterWidth() end },
   { false,      true,     false,      true,         'l',        function() _lt:incMasterWidth() end },
   { false,      true,     false,      true,         'j',        function() _lt:decMasterCount() end },
   { false,      true,     false,      true,         'k',        function() _lt:incMasterCount() end },
 
-  { false,      true,     false,      true,         'f',        function() _view:toggleViewFullscreen(kiwmi:focused_view()) end },
+  { false,      true,     false,      true,         'f',        function() _kw:toggleViewFullscreen(kiwmi:focused_view()) end },
 
-  { false,      true,     false,      false,        '1',        function() _view:switchWorkspace(1) end },
-  { false,      true,     false,      false,        '2',        function() _view:switchWorkspace(2) end },
-  { false,      true,     false,      false,        '3',        function() _view:switchWorkspace(3) end },
+  { false,      true,     false,      false,        '1',        function() _kw:switchWorkspace(1) end },
+  { false,      true,     false,      false,        '2',        function() _kw:switchWorkspace(2) end },
+  { false,      true,     false,      false,        '3',        function() _kw:switchWorkspace(3) end },
 }
 
 kiwmi:on("output", function(output)
@@ -84,7 +84,7 @@ end)
 CURSOR:on("button_down", function(button)
   local v = CURSOR:view_at_pos()
   if v then
-    _view:focusView(v)
+    _kw:focusView(v)
     if _modstate then
       if button == 1 then v:imove() end
       if button == 2 then v:iresize({'b', 'r'}) end
@@ -93,12 +93,12 @@ CURSOR:on("button_down", function(button)
 end)
 
 kiwmi:on("view", function(view)
-  _view:addView(view)
-  _view:focusView(view)
+  _kw:addView(view)
+  _kw:focusView(view)
   view:move(100,100)
 
   view:on("destroy", function(view)
-    _view:removeView(view)
+    _kw:removeView(view)
   end)
 
   view:on("pre_render", function(ev)

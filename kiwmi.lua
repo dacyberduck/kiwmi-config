@@ -8,7 +8,7 @@ M.fs = {
   h = 0,
 }
 
-local _lt = require('kiwmi.layout')
+local _lt = require('layout')
 
 -- hide all views in workspace given or current
 function M:hideWorkspace(ws)
