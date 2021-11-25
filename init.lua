@@ -13,6 +13,7 @@ BWIDTH = 2
 MWIDTH = 0.5
 MCOUNT = 1
 LAYOUT = 1 -- 1 = tile, 2 = monocle, anything else = floating
+GAPS = 5
 
 OUTPUT = false
 CURSOR = kiwmi:cursor()
