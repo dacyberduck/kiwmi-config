@@ -1,0 +1,5 @@
+1) send view to any workspace
+2) invisible space
+  - send a view to invisible space
+  - send a view from invisible space to current workspace or any workspace
+  - toggle switch between current workspace and invisible space
