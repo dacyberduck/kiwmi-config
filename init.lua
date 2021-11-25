@@ -1,26 +1,27 @@
 MODKEY = "Alt_L"
+BWIDTH = 2
+GAPS = 5
 COLORS = { "#4dc653", "#2d4654" }
-WS = {
+WS = {  -- workspaces - lists that holds views per workspace
   [1]   = {},
   [2]   = {},
   [3]   = {},
   [-1]  = {},
   [0]   = 1,
 }
+WSP = {  -- workspace properties ; to reduce unnecessary list accessing
+  layout = { [1] = 1,     [2] = 2,    [3] = 0, },
+  mcount = { [1] = 1,     [2] = 1,    [3] = 1, },
+  mwidth = { [1] = 0.52,  [2] = 0.5,  [3] = 0.6, },
+}
 WSCUR = 1
 WSPRV = 1
-BWIDTH = 2
-MWIDTH = 0.5
-MCOUNT = 1
-LAYOUT = 1 -- 1 = tile, 2 = monocle, anything else = floating
-GAPS = 5
 
 OUTPUT = false
 CURSOR = kiwmi:cursor()
 
 local _modstate
 local _view = require('kiwmi.view')
-local _wrksp = require('kiwmi.workspace')
 local _lt = require('kiwmi.layout')
 
 local keybinds = {
@@ -30,25 +31,26 @@ local keybinds = {
   { false,      true,     false,      true,         'q',        function() kiwmi:quit() end },
   { false,      true,     false,      false,        'q',        function() local v = kiwmi:focused_view() if v then v:close() end end },
 
-  { false,      true,     false,      false,        'Tab',      function() _view:focusViewNext(kiwmi:focused_view()) end },
-  { false,      true,     false,      true,         'Tab',      function() _view:focusViewPrev(kiwmi:focused_view()) end },
+  { false,      true,     false,      false,        't',        function() _lt:layout_tile() end },
+  { false,      true,     false,      true,         't',        function() _lt:layout_monocle() end },
+  { false,      true,     false,      true,         'Return',   function() _lt:arrange_layout() end },
+
+  { false,      true,     false,      false,        'Tab',      function() _view:focusViewNext() end },
+  { false,      true,     false,      true,         'Tab',      function() _view:focusViewPrev() end },
 
   { false,      true,     false,      false,        'm',        function() _view:focusViewMaster() end },
-  { false,      true,     false,      true,         'm',        function() _view:switchViewMaster(kiwmi:focused_view()) end },
+  { false,      true,     false,      true,         'm',        function() _view:switchViewMaster() end },
 
   { false,      true,     false,      true,         'h',        function() _lt:decMasterWidth() end },
   { false,      true,     false,      true,         'l',        function() _lt:incMasterWidth() end },
   { false,      true,     false,      true,         'j',        function() _lt:decMasterCount() end },
   { false,      true,     false,      true,         'k',        function() _lt:incMasterCount() end },
 
-  { false,      true,     false,      false,        't',        function() _lt:layout_tile() end },
-  { false,      true,     false,      true,         't',        function() _lt:layout_monocle() end },
-  { false,      true,     false,      true,         'Return',   function() _lt:arrange_layout() end },
+  { false,      true,     false,      true,         'f',        function() _view:toggleViewFullscreen(kiwmi:focused_view()) end },
 
-  { false,      true,     false,      false,        '1',        function() _wrksp:showWorkspace(1) end },
-  { false,      true,     false,      false,        '2',        function() _wrksp:showWorkspace(2) end },
-  { false,      true,     false,      false,        '3',        function() _wrksp:showWorkspace(3) end },
-  { false,      true,     true,       false,        'Tab',      function() _wrksp:showLastWorkspace() end },
+  { false,      true,     false,      false,        '1',        function() _view:switchWorkspace(1) end },
+  { false,      true,     false,      false,        '2',        function() _view:switchWorkspace(2) end },
+  { false,      true,     false,      false,        '3',        function() _view:switchWorkspace(3) end },
 }
 
 kiwmi:on("output", function(output)
