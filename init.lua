@@ -10,9 +10,9 @@ WS = {  -- workspaces - lists that holds views per workspace
   [0]   = 1,
 }
 WSP = {  -- workspace properties ; to reduce unnecessary list accessing
-  layout = { [1] = 1,     [2] = 2,    [3] = 0, },
-  mcount = { [1] = 1,     [2] = 1,    [3] = 1, },
-  mwidth = { [1] = 0.52,  [2] = 0.5,  [3] = 0.6, },
+  layout = { [1] = 1,     [2] = 1,    [3] = 2,    [-1] = 0, },
+  mcount = { [1] = 1,     [2] = 1,    [3] = 1,    [-1] = 1, },
+  mwidth = { [1] = 0.52,  [2] = 0.5,  [3] = 0.6,  [-1] = 0.5, },
 }
 WSCUR = 1
 WSPRV = 1
@@ -41,16 +41,24 @@ local keybinds = {
   { false,      true,     false,      false,        'm',        function() _kw:focusViewMaster() end },
   { false,      true,     false,      true,         'm',        function() _kw:switchViewMaster() end },
 
-  { false,      true,     false,      true,         'h',        function() _lt:decMasterWidth() end },
-  { false,      true,     false,      true,         'l',        function() _lt:incMasterWidth() end },
-  { false,      true,     false,      true,         'j',        function() _lt:decMasterCount() end },
-  { false,      true,     false,      true,         'k',        function() _lt:incMasterCount() end },
+  { false,      true,     false,      false,        'comma',    function() _lt:decMasterWidth() end },
+  { false,      true,     false,      false,        'period',   function() _lt:incMasterWidth() end },
+  { false,      true,     false,      true,         'comma',    function() _lt:decMasterCount() end },
+  { false,      true,     false,      true,         'period',   function() _lt:incMasterCount() end },
 
   { false,      true,     false,      true,         'f',        function() _kw:toggleViewFullscreen(kiwmi:focused_view()) end },
 
   { false,      true,     false,      false,        '1',        function() _kw:switchWorkspace(1) end },
   { false,      true,     false,      false,        '2',        function() _kw:switchWorkspace(2) end },
   { false,      true,     false,      false,        '3',        function() _kw:switchWorkspace(3) end },
+
+  { false,      true,     false,      true,         '1',        function() _kw:sendViewToWorkspace(1) end },
+  { false,      true,     false,      true,         '2',        function() _kw:sendViewToWorkspace(2) end },
+  { false,      true,     false,      true,         '3',        function() _kw:sendViewToWorkspace(3) end },
+
+  { false,      true,     false,      false,        'h',        function() _kw:pushViewToHiddenSpace() end },
+  { false,      true,     false,      true,         'h',        function() _kw:popViewFromHiddenSpace() end },
+  { false,      true,     true,       false,        'h',        function() _kw:toggleHiddenSpace() end },
 }
 
 kiwmi:on("output", function(output)

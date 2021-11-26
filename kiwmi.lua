@@ -44,14 +44,20 @@ end
 
 -- return the position of view in a workspace
 -- and the workspace number
-function M:getViewPos(view)
-  -- check the current workspace first
+function M:getViewPos(view,ws)
+  -- first check the workspace if given
+  if ws and WS[ws]then
+    for i,j in ipairs(WS[ws]) do
+      if j == view then return i,ws end
+    end
+  end
+  -- then check the current workspace
   for i,j in ipairs(WS[WSCUR]) do
     if j == view then return i,WSCUR end
   end
   -- check all other visible workspaces
   for w,_ in ipairs(WS) do
-    if w ~= WSCUR then
+    if w ~= WSCUR and w ~= ws then
       for i,j in ipairs(WS[w]) do
         if j == view then return i,w end
       end
@@ -93,9 +99,10 @@ function M:addView(view,ws)
   view:tiled(true)
 end
 
-function M:removeView(view)
+function M:removeView(view,ws)
   -- get the position and workspace of the view
-  local i,w = self:getViewPos(view)
+  local i,w = self:getViewPos(view,ws)
+
   -- remove view from table
   table.remove(WS[w],i)
   -- if view was last focused view then
@@ -112,7 +119,7 @@ end
 -- focus next view on current workspace
 function M:focusViewNext()
   if #WS[WSCUR] < 2 then return end
-  local i,_ = self:getViewPos(WS[WSCUR][0])
+  local i,_ = self:getViewPos(WS[WSCUR][0],WSCUR)
   local next = WS[WSCUR][i+1]
   if next then
     self:focusView(next)
@@ -124,7 +131,7 @@ end
 -- focus prev view on current workspace
 function M:focusViewPrev()
   if #WS[WSCUR] < 2 then return end
-  local i,_ = self:getViewPos(WS[WSCUR][0])
+  local i,_ = self:getViewPos(WS[WSCUR][0],WSCUR)
   if i > 1 then
     self:focusView(WS[WSCUR][i-1])
   else
@@ -144,12 +151,13 @@ end
 -- automatically calls layout arrange
 function M:switchViewMaster()
   if #WS[WSCUR] < 2 then return end
-  local i,_ = self:getViewPos(WS[WSCUR][0])
+  local i,_ = self:getViewPos(WS[WSCUR][0],WSCUR)
   WS[WSCUR][i],WS[WSCUR][1] = WS[WSCUR][1],WS[WSCUR][i]
   _lt:arrange_layout()
 end
 
--- toggle fullscreen on a view
+-- toggle fullscreen on a view ; dead simple logic
+-- fails if focus changes after making a view fullscreen
 function M:toggleViewFullscreen(view)
   if not view then return end
   if self.fs.s then
@@ -164,6 +172,45 @@ function M:toggleViewFullscreen(view)
     self.fs.s = true
   end
   OUTPUT:redraw()
+end
+
+-- send a view to a workspace
+function M:sendViewToWorkspace(ws,view)
+  local v = view or WS[WSCUR][0]
+  if not v or not ws then return end
+  -- first remove the vew from existing workspace
+  -- and hide the view
+  self:removeView(v)
+  v:hide()
+  -- add the view to the target workspace
+  self:addView(v,ws)
+  -- update current workspace
+  self:focusView()
+  self:showWorkspace()
+end
+
+function M:pushViewToHiddenSpace()
+  if WSCUR == -1 then return end
+  self:sendViewToWorkspace(-1)
+end
+
+function M:popViewFromHiddenSpace()
+  if WSCUR == -1 then return end
+  local v = WS[-1][0]
+  if not v then return end
+  self:removeView(v,-1)
+  self:addView(v)
+  v:hide()
+  self:focusView()
+  self:showWorkspace()
+end
+
+function M:toggleHiddenSpace()
+  if WSCUR == -1 then
+    self:switchWorkspace(WSPRV)
+  else
+    self:switchWorkspace(-1)
+  end
 end
 
 return M
