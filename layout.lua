@@ -2,7 +2,30 @@ local M = {}
 
 function M:ROUND(x) return math.floor(x+0.5) end
 
+-- simple tiling layout
 function M:layout_tile(ws)
+  -- --------------------
+  -- |          |       |
+  -- |    M     |   S   |
+  -- |    A     |-------|
+  -- |    S     |       |
+  -- | - -T - - |   S   |
+  -- |    E     |-------|
+  -- |    R     |       |
+  -- |          |   S   |
+  -- --------------------
+  --
+  -- simply tile the views equally on the
+  -- stack space ; on the master area respect
+  -- master count and divide equally
+  -- does not handle extra spaces ; left unused
+  -- so some extra spaces may be visible
+  -- respects border width and gaps
+  -- since the tiling behaviour is not something like dwm or bspwm
+  -- and tiling is only handled by keybinding when required rather
+  -- than always doing it dynamically, we don't need to worry about
+  -- those small unused spaces.
+
   local w = ws or WSCUR
 
   local n = #WS[w]
@@ -48,6 +71,7 @@ function M:layout_tile(ws)
   WSP.layout[w] = 1
 end
 
+-- monocle layout; maximize all view
 function M:layout_monocle(ws)
   local w = ws or WSCUR
   if #WS[w] < 1 then return end
@@ -60,15 +84,18 @@ function M:layout_monocle(ws)
   WSP.layout[w] = 2
 end
 
-function M:arrange_layout(ws)
+-- arrange layout depending on workspace layout
+function M:arrange_layout(ws,layout)
   local w = ws or WSCUR
-  if WSP.layout[w] == 1 then
+  local lt = layout or WSP.layout[w]
+  if lt == 1 then
     self:layout_tile(w)
-  elseif WSP.layout[w] == 2 then
+  elseif lt == 2 then
     self:layout_monocle(w)
   end
 end
 
+-- increment master area
 function M:incMasterWidth(ws)
   local w = ws or WSCUR
   local mw = WSP.mwidth[w]
@@ -76,6 +103,7 @@ function M:incMasterWidth(ws)
   self:arrange_layout(w)
 end
 
+-- decrement master area
 function M:decMasterWidth(ws)
   local w = ws or WSCUR
   local mw = WSP.mwidth[w]
@@ -83,12 +111,14 @@ function M:decMasterWidth(ws)
   self:arrange_layout(w)
 end
 
+-- increment view count in master area
 function M:incMasterCount(ws)
   local w = ws or WSCUR
   WSP.mcount[w] = WSP.mcount[w]+1
   self:arrange_layout(w)
 end
 
+-- decrement view count in master area
 function M:decMasterCount(ws)
   local w = ws or WSCUR
   local mc = WSP.mcount[w]
