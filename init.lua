@@ -1,4 +1,4 @@
-MODKEY = "Alt_L"
+MODKEY = "Super_L"
 BWIDTH = 2
 GAPS = 5
 COLORS = { "#4dc653", "#2d4654" }
@@ -26,39 +26,49 @@ local _lt = require('layout')
 
 local keybinds = {
   -- super -- -- alt -- -- ctrl -- -- shift -- -- -- key -- -- -- action --
-  { false,      true,     false,      false,        'Return',   function() kiwmi:spawn("alacritty") end },
-  { false,      true,     false,      false,        'p',        function() kiwmi:spawn("kickoff") end },
-  { false,      true,     false,      true,         'q',        function() kiwmi:quit() end },
-  { false,      true,     false,      false,        'q',        function() local v = kiwmi:focused_view() if v then v:close() end end },
+  { true,       false,    false,      false,        'Return',   function() kiwmi:spawn("alacritty") end },
+  { true,       false,    false,      false,        'space',    function() kiwmi:spawn("kickoff") end },
+  { true,       false,    true,       true,         'q',        function() kiwmi:quit() end },
+  { true,       false,    false,      false,        'q',        function() local v = kiwmi:focused_view() if v then v:close() end end },
 
-  { false,      true,     false,      false,        't',        function() _lt:layout_tile() end },
-  { false,      true,     false,      true,         't',        function() _lt:layout_monocle() end },
-  { false,      true,     false,      true,         'Return',   function() _lt:arrange_layout() end },
+  { true,       false,    false,      false,        't',        function() _lt:layout_tile() end },
+  { true,       false,    false,      true,         't',        function() _lt:layout_monocle() end },
+  { true,       false,    false,      true,         'Return',   function() _lt:arrange_layout() end },
+  { true,       false,    true,       false,        'Return',   function() _kw:toggleViewMaximize() end },
 
-  { false,      true,     false,      false,        'Tab',      function() _kw:focusViewNext() end },
-  { false,      true,     false,      true,         'Tab',      function() _kw:focusViewPrev() end },
+  { true,       false,    false,      false,        'Tab',      function() _kw:focusViewNext() end },
+  { true,       false,    false,      true,         'Tab',      function() _kw:focusViewPrev() end },
 
-  { false,      true,     false,      false,        'm',        function() _kw:focusViewMaster() end },
-  { false,      true,     false,      true,         'm',        function() _kw:switchViewMaster() end },
+  { true,       false,    false,      false,        'm',        function() _kw:focusViewMaster() end },
+  { true,       false,    false,      true,         'm',        function() _kw:switchViewMaster() end },
 
-  { false,      true,     false,      false,        'comma',    function() _lt:decMasterWidth() end },
-  { false,      true,     false,      false,        'period',   function() _lt:incMasterWidth() end },
-  { false,      true,     false,      true,         'comma',    function() _lt:decMasterCount() end },
-  { false,      true,     false,      true,         'period',   function() _lt:incMasterCount() end },
+  { true,       false,    false,      false,        'comma',    function() _lt:decMasterWidth() end },
+  { true,       false,    false,      false,        'period',   function() _lt:incMasterWidth() end },
+  { true,       false,    false,      true,         'comma',    function() _lt:decMasterCount() end },
+  { true,       false,    false,      true,         'period',   function() _lt:incMasterCount() end },
 
-  { false,      true,     false,      true,         'f',        function() _kw:toggleViewFullscreen(kiwmi:focused_view()) end },
+  { true,       false,    false,      true,         'f',        function() _kw:toggleViewFullscreen() end },
 
-  { false,      true,     false,      false,        '1',        function() _kw:switchWorkspace(1) end },
-  { false,      true,     false,      false,        '2',        function() _kw:switchWorkspace(2) end },
-  { false,      true,     false,      false,        '3',        function() _kw:switchWorkspace(3) end },
+  { true,       false,    false,      false,        '1',        function() _kw:switchWorkspace(1) end },
+  { true,       false,    false,      false,        '2',        function() _kw:switchWorkspace(2) end },
+  { true,       false,    false,      false,        '3',        function() _kw:switchWorkspace(3) end },
 
-  { false,      true,     false,      true,         '1',        function() _kw:sendViewToWorkspace(1) end },
-  { false,      true,     false,      true,         '2',        function() _kw:sendViewToWorkspace(2) end },
-  { false,      true,     false,      true,         '3',        function() _kw:sendViewToWorkspace(3) end },
+  { true,       false,    false,      true,         '1',        function() _kw:sendViewToWorkspace(1) end },
+  { true,       false,    false,      true,         '2',        function() _kw:sendViewToWorkspace(2) end },
+  { true,       false,    false,      true,         '3',        function() _kw:sendViewToWorkspace(3) end },
 
-  { false,      true,     false,      false,        'h',        function() _kw:pushViewToHiddenSpace() end },
-  { false,      true,     false,      true,         'h',        function() _kw:popViewFromHiddenSpace() end },
-  { false,      true,     true,       false,        'h',        function() _kw:toggleHiddenSpace() end },
+  { true,       false,    false,      false,        'h',        function() _kw:pushViewToHiddenSpace() end },
+  { true,       false,    false,      true,         'h',        function() _kw:popViewFromHiddenSpace() end },
+  { true,       false,    true,       false,        'h',        function() _kw:toggleHiddenSpace() end },
+
+  { false, false, false, false, 'XF86MonBrighnessUp',     function() kiwmi:spawn("xbacklight -inc 5") end },
+  { false, false, false, false, 'XF86MonBrighnessDown',   function() kiwmi:spawn("xbacklight -dec 5") end },
+  { false, false, false, false, 'XF86AudioRaiseVolume',   function() kiwmi:spawn("amixer -D pipewire set Master 5%+") end },
+  { false, false, false, false, 'XF86AudioLowerVolume',   function() kiwmi:spawn("amixer -D pipewire set Master 5%-") end },
+  { false, false, false, false, 'XF86AudioMute',          function() kiwmi:spawn("amixer set Master toggle") end },
+  { false, false, false, false, 'XF86AudioMicMute',       function() kiwmi:spawn("amixer set Capture toggle") end },
+  { false, false, false, false, 'Print',
+    function() kiwmi:spawn("grim -t png " .. os.getenv("HOME") .. "/Pictures/screenshot-$(date +%Y-%m-%d-%H-%M-%S).png") end },
 }
 
 kiwmi:on("output", function(output)
@@ -119,4 +129,16 @@ kiwmi:on("view", function(view)
       ev.renderer:draw_rect(COLORS[2], vx-BWIDTH, vy-BWIDTH, vw+2*BWIDTH, vh+2*BWIDTH)
     end
   end)
+
+  view:on("request_move", function()
+    view:imove()
+  end)
+
+  view:on("request_resize", function(ev)
+    view:iresize(ev.edges)
+  end)
+
 end)
+
+kiwmi:spawn("swaybg -m fit -i " .. os.getenv("HOME") .. "/Pictures/wallpaper.jpg")
+kiwmi:spawn("pipewire 2>/dev/null")
