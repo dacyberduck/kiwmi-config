@@ -1,7 +1,7 @@
-MODKEY = "Super_L"
-BWIDTH = 2
-GAPS = 5
-COLORS = { "#4dc653", "#2d4654" }
+MODKEY = "Super_L"      -- default modkey for mouse actions
+BWIDTH = 2              -- border width in pixels
+GAPS = 5                -- gaps between edge and views in pixels
+COLORS = { "#4dc653", "#2d4654" }   -- colors for borders and stuff
 WS = {  -- workspaces - lists that holds views per workspace
   [1]   = {},
   [2]   = {},
@@ -31,11 +31,6 @@ local keybinds = {
   { true,       false,    true,       true,         'q',        function() kiwmi:quit() end },
   { true,       false,    false,      false,        'q',        function() local v = kiwmi:focused_view() if v then v:close() end end },
 
-  { true,       false,    false,      false,        't',        function() _lt:layout_tile() end },
-  { true,       false,    false,      true,         't',        function() _lt:layout_monocle() end },
-  { true,       false,    false,      true,         'Return',   function() _lt:arrange_layout() end },
-  { true,       false,    true,       false,        'Return',   function() _kw:toggleViewMaximize() end },
-
   { true,       false,    false,      false,        'Tab',      function() _kw:focusViewNext() end },
   { true,       false,    false,      true,         'Tab',      function() _kw:focusViewPrev() end },
 
@@ -47,12 +42,23 @@ local keybinds = {
   { true,       false,    false,      true,         'comma',    function() _lt:decMasterCount() end },
   { true,       false,    false,      true,         'period',   function() _lt:incMasterCount() end },
 
+  { true,       false,    false,      true,         'Left',     function() _lt:moveView(kiwmi:focused_view(),20,{-1,0}) end },
+  { true,       false,    false,      true,         'Right',    function() _lt:moveView(kiwmi:focused_view(),20,{1,0}) end },
+  { true,       false,    false,      true,         'Up',       function() _lt:moveView(kiwmi:focused_view(),20,{0,-1}) end },
+  { true,       false,    false,      true,         'Down',     function() _lt:moveView(kiwmi:focused_view(),20,{0,1}) end },
+  { true,       false,    true,       false,        'Left',     function() _lt:snapViewToEdge(kiwmi:focused_view(),"left") end },
+  { true,       false,    true,       false,        'Right',    function() _lt:snapViewToEdge(kiwmi:focused_view(),"right") end },
+  { true,       false,    true,       false,        'Up',       function() _lt:snapViewToEdge(kiwmi:focused_view(),"up") end },
+  { true,       false,    true,       false,        'Down',     function() _lt:snapViewToEdge(kiwmi:focused_view(),"down") end },
+  { true,       false,    true,       false,        'Return',   function() _kw:toggleViewMaximize() end },
   { true,       false,    false,      true,         'f',        function() _kw:toggleViewFullscreen() end },
+  { true,       false,    false,      false,        't',        function() _lt:layout_tile() end },
+  { true,       false,    false,      true,         't',        function() _lt:layout_monocle() end },
+  { true,       false,    false,      true,         'Return',   function() _lt:arrange_layout() end },
 
   { true,       false,    false,      false,        '1',        function() _kw:switchWorkspace(1) end },
   { true,       false,    false,      false,        '2',        function() _kw:switchWorkspace(2) end },
   { true,       false,    false,      false,        '3',        function() _kw:switchWorkspace(3) end },
-
   { true,       false,    false,      true,         '1',        function() _kw:sendViewToWorkspace(1) end },
   { true,       false,    false,      true,         '2',        function() _kw:sendViewToWorkspace(2) end },
   { true,       false,    false,      true,         '3',        function() _kw:sendViewToWorkspace(3) end },
@@ -67,8 +73,7 @@ local keybinds = {
   { false, false, false, false, 'XF86AudioLowerVolume',   function() kiwmi:spawn("amixer -D pipewire set Master 5%-") end },
   { false, false, false, false, 'XF86AudioMute',          function() kiwmi:spawn("amixer set Master toggle") end },
   { false, false, false, false, 'XF86AudioMicMute',       function() kiwmi:spawn("amixer set Capture toggle") end },
-  { false, false, false, false, 'Print',
-    function() kiwmi:spawn("grim -t png " .. os.getenv("HOME") .. "/Pictures/screenshot-$(date +%Y-%m-%d-%H-%M-%S).png") end },
+  { false, false, false, false, 'Print', function() kiwmi:spawn("grim -t png "..os.getenv("HOME").."/Pictures/screenshot-$(date +%Y-%m-%d-%H-%M-%S).png") end },
 }
 
 kiwmi:on("output", function(output)

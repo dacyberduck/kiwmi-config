@@ -126,4 +126,37 @@ function M:decMasterCount(ws)
   self:arrange_layout(w)
 end
 
+-- move a view to a direction
+-- view -> takes a view
+-- step -> how many pixels to move
+-- dir  -> direction - a table with x,y
+-- { x = -1/0/1, y = -1/0/1 }
+function M:moveView(view,step,dir)
+  if not view then return end
+  local vx,vy = view:pos()
+  view:move(vx+step*dir[1],vy+step*dir[2])
+end
+
+-- snap view to an edge
+function M:snapViewToEdge(view,dir)
+  if not view then return end
+  local o = OUTPUT:usable_area()
+  if dir == "left" then
+    view:move(o.x+BWIDTH+GAPS,o.y+BWIDTH+GAPS)
+    view:resize(o.width/2-2*(BWIDTH+GAPS),o.height-2*(BWIDTH+GAPS))
+  end
+  if dir == "right" then
+    view:move(o.x+o.width/2+BWIDTH+GAPS,o.y+BWIDTH+GAPS)
+    view:resize(o.width/2-2*(BWIDTH+GAPS),o.height-2*(BWIDTH+GAPS))
+  end
+  if dir == "up" then
+    view:move(o.x+BWIDTH+GAPS,o.y+BWIDTH+GAPS)
+    view:resize(o.width-2*(BWIDTH+GAPS),o.height/2-2*(BWIDTH+GAPS))
+  end
+  if dir == "down" then
+    view:move(o.x+BWIDTH+GAPS,o.y+o.height/2+BWIDTH+GAPS)
+    view:resize(o.width-2*(BWIDTH+GAPS),o.height/2-2*(BWIDTH+GAPS))
+  end
+end
+
 return M
