@@ -1,12 +1,6 @@
 local M = {}
-
-M.fs = {
-  s = false,
-  x = 0,
-  y = 0,
-  w = 0,
-  h = 0,
-}
+M.ms = { x = 0, y = 0, w = 0, h = 0 }
+M.fs = { x = 0, y = 0, w = 0, h = 0 }
 
 local _lt = require('layout')
 
@@ -156,24 +150,6 @@ function M:switchViewMaster()
   _lt:arrange_layout()
 end
 
--- toggle fullscreen on a view ; dead simple logic
--- fails if focus changes after making a view fullscreen
-function M:toggleViewFullscreen(view)
-  if not view then return end
-  if self.fs.s then
-    view:move(self.fs.x,self.fs.y)
-    view:resize(self.fs.w,self.fs.h)
-    self.fs.s = false
-  else
-    self.fs.x,self.fs.y = view:pos()
-    self.fs.w,self.fs.h = view:size()
-    view:move(OUTPUT:pos())
-    view:resize(OUTPUT:size())
-    self.fs.s = true
-  end
-  OUTPUT:redraw()
-end
-
 -- send a view to a workspace
 function M:sendViewToWorkspace(ws,view)
   local v = view or WS[WSCUR][0]
@@ -189,11 +165,14 @@ function M:sendViewToWorkspace(ws,view)
   self:showWorkspace()
 end
 
+-- send a view to hidden space
 function M:pushViewToHiddenSpace()
   if WSCUR == -1 then return end
   self:sendViewToWorkspace(-1)
 end
 
+-- get back the last view from hidden space
+-- to the current space
 function M:popViewFromHiddenSpace()
   if WSCUR == -1 then return end
   local v = WS[-1][0]
@@ -205,12 +184,55 @@ function M:popViewFromHiddenSpace()
   self:showWorkspace()
 end
 
+-- switch between hidden space and
+-- current space
 function M:toggleHiddenSpace()
   if WSCUR == -1 then
     self:switchWorkspace(WSPRV)
   else
     self:switchWorkspace(-1)
   end
+end
+
+-- toggle maximize view ; unlike fullscreen
+-- it respects border width and gaps
+function M:toggleViewMaximize(view)
+  local v = view or WS[WSCUR][0]
+  if not v then return end
+  local vw,vh = v:size()
+  local o = OUTPUT:usable_area()
+  local mx = o.x+BWIDTH+GAPS
+  local my = o.y+BWIDTH+GAPS
+  local mw = o.width-2*(BWIDTH+GAPS)
+  local mh = o.height-2*(BWIDTH+GAPS)
+  if vw == mw and vh == oh then
+    v:move(self.ms.x,self.ms.y)
+    v:resize(self.ms.w,self.ms.h)
+  else
+    self.ms.x,self.ms.y = v:pos()
+    self.ms.w,self.ms.h = vw,vh
+    v:move(mx,my)
+    v:resize(mw,mh)
+  end
+  OUTPUT:redraw()
+end
+
+-- toggle fullscreen view
+function M:toggleViewFullscreen(view)
+  local v = view or WS[WSCUR][0]
+  if not v then return end
+  local vw,vh = v:size()
+  local ow,oh = OUTPUT:size()
+  if vw == ow and vh == oh then
+    v:move(self.fs.x,self.fs.y)
+    v:resize(self.fs.w,self.fs.h)
+  else
+    self.fs.x,self.fs.y = v:pos()
+    self.fs.w,self.fs.h = v:size()
+    v:move(OUTPUT:pos())
+    v:resize(OUTPUT:size())
+  end
+  OUTPUT:redraw()
 end
 
 return M
