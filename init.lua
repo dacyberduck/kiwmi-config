@@ -2,25 +2,31 @@ MODKEY = "Super_L"      -- default modkey for mouse actions
 BWIDTH = 2              -- border width in pixels
 GAPS = 5                -- gaps between edge and views in pixels
 COLORS = { "#4dc653", "#2d4654" }   -- colors for borders and stuff
-WS = {  -- workspaces - lists that holds views per workspace
-  [1]   = {},
-  [2]   = {},
-  [3]   = {},
-  [-1]  = {},
-  [0]   = 1,
+WS = {  -- workspaces - tables that holds views per workspace
+  -- the behaviour of these tables are like the stack; last in first output
+  -- which means; the last view spawned will be at first position and
+  -- will be the "master" view
+  [1]   = {},   -- workspace - 1
+  [2]   = {},   -- workspace - 2
+  [3]   = {},   -- worlspace - 3
+  [-1]  = {},   -- hidden space
+  [0]   = 1,    -- holds currnt workspace id
 }
-WSP = {  -- workspace properties ; to reduce unnecessary list accessing
+WSP = {  -- workspace properties ; this separtion is to reduce nested table accessing
+  -- layouts; 1 - tile; 2 - monocle; 0 - no layout; manual or float behaviour
   layout = { [1] = 1,     [2] = 1,    [3] = 2,    [-1] = 0, },
+  -- count of views in master area; for tile layout, value = 1 or higher
   mcount = { [1] = 1,     [2] = 1,    [3] = 1,    [-1] = 1, },
+  -- master view width; for tile layout; value = between 0.25 to 0.75
   mwidth = { [1] = 0.52,  [2] = 0.5,  [3] = 0.6,  [-1] = 0.5, },
 }
-WSCUR = 1
-WSPRV = 1
+WSCUR = 1                 -- holds id of curent workspace
+WSPRV = 1                 -- holds id of previous workspace
 
-OUTPUT = false
-CURSOR = kiwmi:cursor()
+OUTPUT = false            -- holds reference to the output
+CURSOR = kiwmi:cursor()   -- holds rference to the cursor
 
-local _modstate
+local _modstate           -- holds the state of mod key; pressed = true, released = false
 local _kw = require('kiwmi')
 local _lt = require('layout')
 
@@ -34,8 +40,8 @@ local keybinds = {
   { true,       false,    false,      false,        'Tab',      function() _kw:focusViewNext() end },
   { true,       false,    false,      true,         'Tab',      function() _kw:focusViewPrev() end },
 
-  { true,       false,    false,      false,        'm',        function() _kw:focusViewMaster() end },
-  { true,       false,    false,      true,         'm',        function() _kw:switchViewMaster() end },
+  { true,       false,    false,      false,        'm',        function() _kw:focusViewLast() end },
+  { true,       false,    false,      true,         'm',        function() _kw:makeViewLast() end },
 
   { true,       false,    false,      false,        'comma',    function() _lt:decMasterWidth() end },
   { true,       false,    false,      false,        'period',   function() _lt:incMasterWidth() end },
@@ -54,11 +60,12 @@ local keybinds = {
   { true,       false,    false,      true,         'f',        function() _lt:toggleViewFullscreen() end },
   { true,       false,    false,      false,        't',        function() _lt:layout_tile() end },
   { true,       false,    false,      true,         't',        function() _lt:layout_monocle() end },
+  { true,       false,    true,       false,        't',        function() _lt:layout_null() end },
   { true,       false,    false,      true,         'Return',   function() _lt:arrange_layout() end },
 
-  { true,       false,    false,      false,        '1',        function() _kw:switchWorkspace(1) end },
-  { true,       false,    false,      false,        '2',        function() _kw:switchWorkspace(2) end },
-  { true,       false,    false,      false,        '3',        function() _kw:switchWorkspace(3) end },
+  { true,       false,    false,      false,        '1',        function() _kw:switchToWorkspace(1) end },
+  { true,       false,    false,      false,        '2',        function() _kw:switchToWorkspace(2) end },
+  { true,       false,    false,      false,        '3',        function() _kw:switchToWorkspace(3) end },
   { true,       false,    false,      true,         '1',        function() _kw:sendViewToWorkspace(1) end },
   { true,       false,    false,      true,         '2',        function() _kw:sendViewToWorkspace(2) end },
   { true,       false,    false,      true,         '3',        function() _kw:sendViewToWorkspace(3) end },
@@ -76,10 +83,12 @@ local keybinds = {
   { false, false, false, false, 'Print', function() kiwmi:spawn("grim -t png "..os.getenv("HOME").."/Pictures/screenshot-$(date +%Y-%m-%d-%H-%M-%S).png") end },
 }
 
+-- on new output, store it's reference in OUTPUT
 kiwmi:on("output", function(output)
   OUTPUT = output
 end)
 
+-- initialize keyboard
 kiwmi:on("keyboard", function(keyboard)
   keyboard:on("key_up", function(ev)
     _modstate = ev.key == MODKEY and false
@@ -100,10 +109,12 @@ kiwmi:on("keyboard", function(keyboard)
   end)
 end)
 
+-- cursor button release handling
 CURSOR:on("button_up", function()
   kiwmi:stop_interactive()
 end)
 
+-- cursor button press handling
 CURSOR:on("button_down", function(button)
   local v = CURSOR:view_at_pos()
   if v then
@@ -115,15 +126,19 @@ CURSOR:on("button_down", function(button)
   end
 end)
 
+-- on event view
 kiwmi:on("view", function(view)
+  -- when a new view is spawned
   _kw:addView(view)
   _kw:focusView(view)
   view:move(100,100)
 
+  -- when a view is getting destoyed
   view:on("destroy", function(view)
     _kw:removeView(view)
   end)
 
+  -- render objects before the view is drawn
   view:on("pre_render", function(ev)
     local vx,vy = view:pos()
     local vw,vh = view:size()
@@ -135,15 +150,18 @@ kiwmi:on("view", function(view)
     end
   end)
 
+  -- when the view request for interactive move
   view:on("request_move", function()
     view:imove()
   end)
 
+  -- when the view request for interactive resize
   view:on("request_resize", function(ev)
     view:iresize(ev.edges)
   end)
 
 end)
 
+-- startup programs; this is probably ugly but works
 kiwmi:spawn("swaybg -m fit -i " .. os.getenv("HOME") .. "/Pictures/wallpaper.jpg")
 kiwmi:spawn("pipewire 2>/dev/null")

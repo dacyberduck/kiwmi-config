@@ -85,6 +85,13 @@ function M:layout_monocle(ws)
   WSP.layout[w] = 2
 end
 
+-- no layout; basically set current layout to 0
+-- which makes arrange_layout() will do nothing
+function M:layout_null(ws)
+  local w = ws or WSCUR
+  WSP.layout[w] = 0
+end
+
 -- arrange layout depending on workspace layout
 function M:arrange_layout(ws,layout)
   local w = ws or WSCUR
@@ -173,13 +180,7 @@ function M:toggleViewMaximize(view)
   local mw = o.width-2*(BWIDTH+GAPS)
   local mh = o.height-2*(BWIDTH+GAPS)
 
-  if vx ~= mx and vy ~= my and vw ~= mw and vh ~= mh then
-    -- if the view is not maximized then store its dimension
-    -- in M.maximized table
-    self.maximizedViews[v] = {vx,vy,vw,vh}
-    v:move(mx,my)
-    v:resize(mw,mh)
-  else
+  if vx == mx and vy == my and vw == mw and vh == mh then
     -- if the view is maximized then restore its original
     -- dimensions from M.maximized table
     for i,j in pairs(self.maximizedViews) do
@@ -190,6 +191,12 @@ function M:toggleViewMaximize(view)
         j = nil
       end
     end
+  else
+    -- if the view is not maximized then store its dimension
+    -- in M.maximized table
+    self.maximizedViews[v] = {vx,vy,vw,vh}
+    v:move(mx,my)
+    v:resize(mw,mh)
   end
 end
 
@@ -199,12 +206,9 @@ function M:toggleViewFullscreen(view)
   if not v then return end
   local vx,vy = v:pos()
   local vw,vh = v:size()
-  local ox,oy,ow,oh = OUTPUT:pos(),OUTPUT:size()
-  if vx ~= ox and vy ~= oy and vw ~= ow and vh ~= oh then
-    self.fullscreenViews[v] = {vx,vy,vw,vh}
-    v:move(OUTPUT:pos())
-    v:resize(OUTPUT:size())
-  else
+  local ox,oy = OUTPUT:pos()
+  local ow,oh = OUTPUT:size()
+  if vx == ox and vy == oy and vw == ow and vh == oh then
     for i,j in pairs(self.fullscreenViews) do
       if i == v then
         v:move(j[1],j[2])
@@ -213,6 +217,10 @@ function M:toggleViewFullscreen(view)
         j = nil
       end
     end
+  else
+    self.fullscreenViews[v] = {vx,vy,vw,vh}
+    v:move(OUTPUT:pos())
+    v:resize(OUTPUT:size())
   end
 end
 

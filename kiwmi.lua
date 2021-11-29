@@ -2,38 +2,6 @@ local M = {}
 
 local _lt = require('layout')
 
--- hide all views in workspace given or current
-function M:hideWorkspace(ws)
-  local w = ws or WSCUR
-  for _,v in ipairs(WS[w]) do
-    v:hide()
-  end
-  OUTPUT:redraw()
-end
-
--- show all views in workspace given or current
-function M:showWorkspace(ws)
-  local w = ws or WSCUR
-  for _,v in ipairs(WS[w]) do
-    v:show()
-  end
-  OUTPUT:redraw()
-end
-
--- switch to given workspace
-function M:switchWorkspace(ws)
-  self:hideWorkspace()
-  WSPRV = WSCUR
-  WSCUR = ws
-  self:showWorkspace()
-  self:focusView()
-end
-
--- show the last workspace switched from
-function M:showLastWorkspace()
-  self:showWorkspace(WSPRV)
-end
-
 -- return the position of view in a workspace
 -- and the workspace number
 function M:getViewPos(view,ws)
@@ -76,7 +44,7 @@ function M:focusView(view,ws)
       WS[w][0]:show()
       WS[w][0]:focus()
     else
-      self:switchWorkspace(w)
+      self:switchToWorkspace(w)
       self:focusView()
     end
   end
@@ -131,21 +99,62 @@ function M:focusViewPrev()
   end
 end
 
--- focus on master/last view spawned on current workspace
+-- focus on last view spawned on current workspace
+-- or simply the first view in the workspace table
 -- from any other focused view on the current workspace
-function M:focusViewMaster()
+function M:focusViewLast()
   if #WS[WSCUR] < 2 or kiwmi:focused_view() == WS[WSCUR][1] then return end
   self:focusView(WS[WSCUR][1])
 end
 
--- make the currently focused view the master view
--- of the workspace
--- automatically calls layout arrange
-function M:switchViewMaster()
+-- make the currently focused view the last view spawned
+-- or simply the first entry in the workspace table
+-- swap the last spawned view position with the current view position
+-- in the workspace table of views
+-- this makes the selected view the master view of the workspace
+-- and automatically calls layout arrange
+function M:makeViewLast()
   if #WS[WSCUR] < 2 then return end
   local i,_ = self:getViewPos(WS[WSCUR][0],WSCUR)
   WS[WSCUR][i],WS[WSCUR][1] = WS[WSCUR][1],WS[WSCUR][i]
   _lt:arrange_layout()
+end
+
+-- hide all views in workspace given or current
+function M:hideWorkspace(ws)
+  local w = ws or WSCUR
+  for _,v in ipairs(WS[w]) do
+    v:hide()
+  end
+  OUTPUT:redraw()
+end
+
+-- show all views in workspace given or current
+function M:showWorkspace(ws)
+  local w = ws or WSCUR
+  for _,v in ipairs(WS[w]) do
+    v:show()
+  end
+  OUTPUT:redraw()
+end
+
+-- switch to given workspace
+function M:switchToWorkspace(ws)
+  self:hideWorkspace()
+  WSPRV = WSCUR
+  WSCUR = ws
+  self:showWorkspace()
+  self:focusView()
+end
+
+-- switch between hidden space and
+-- current space
+function M:toggleHiddenSpace()
+  if WSCUR == -1 then
+    self:switchToWorkspace(WSPRV)
+  else
+    self:switchToWorkspace(-1)
+  end
 end
 
 -- send a view to a workspace
@@ -180,16 +189,6 @@ function M:popViewFromHiddenSpace()
   v:hide()
   self:focusView()
   self:showWorkspace()
-end
-
--- switch between hidden space and
--- current space
-function M:toggleHiddenSpace()
-  if WSCUR == -1 then
-    self:switchWorkspace(WSPRV)
-  else
-    self:switchWorkspace(-1)
-  end
 end
 
 return M
