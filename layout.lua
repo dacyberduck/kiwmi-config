@@ -1,5 +1,8 @@
 local M = {}
 
+M.ms = { x = 0, y = 0, w = 0, h = 0 }
+M.fs = { x = 0, y = 0, w = 0, h = 0 }
+
 function M:ROUND(x) return math.floor(x+0.5) end
 
 -- simple tiling layout
@@ -157,6 +160,47 @@ function M:snapViewToEdge(view,dir)
     view:move(o.x+BWIDTH+GAPS,o.y+o.height/2+BWIDTH+GAPS)
     view:resize(o.width-2*(BWIDTH+GAPS),o.height/2-2*(BWIDTH+GAPS))
   end
+end
+
+-- toggle maximize view ; unlike fullscreen
+-- it respects border width and gaps
+function M:toggleViewMaximize(view)
+  local v = view or WS[WSCUR][0]
+  if not v then return end
+  local vw,vh = v:size()
+  local o = OUTPUT:usable_area()
+  local mx = o.x+BWIDTH+GAPS
+  local my = o.y+BWIDTH+GAPS
+  local mw = o.width-2*(BWIDTH+GAPS)
+  local mh = o.height-2*(BWIDTH+GAPS)
+  if vw == mw and vh == mh then
+    v:move(self.ms.x,self.ms.y)
+    v:resize(self.ms.w,self.ms.h)
+  else
+    self.ms.x,self.ms.y = v:pos()
+    self.ms.w,self.ms.h = vw,vh
+    v:move(mx,my)
+    v:resize(mw,mh)
+  end
+  OUTPUT:redraw()
+end
+
+-- toggle fullscreen view
+function M:toggleViewFullscreen(view)
+  local v = view or WS[WSCUR][0]
+  if not v then return end
+  local vw,vh = v:size()
+  local ow,oh = OUTPUT:size()
+  if vw == ow and vh == oh then
+    v:move(self.fs.x,self.fs.y)
+    v:resize(self.fs.w,self.fs.h)
+  else
+    self.fs.x,self.fs.y = v:pos()
+    self.fs.w,self.fs.h = v:size()
+    v:move(OUTPUT:pos())
+    v:resize(OUTPUT:size())
+  end
+  OUTPUT:redraw()
 end
 
 return M
