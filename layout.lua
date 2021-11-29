@@ -1,7 +1,7 @@
 local M = {}
 
-M.ms = { x = 0, y = 0, w = 0, h = 0 }
-M.fs = { x = 0, y = 0, w = 0, h = 0 }
+M.maximizedViews = {}
+M.fullscreenViews = {}
 
 function M:ROUND(x) return math.floor(x+0.5) end
 
@@ -70,7 +70,6 @@ function M:layout_tile(ws)
     j:resize(vw,vh)
   end
 
-  OUTPUT:redraw()
   WSP.layout[w] = 1
 end
 
@@ -83,7 +82,6 @@ function M:layout_monocle(ws)
     v:move(o.x+BWIDTH+GAPS,o.y+BWIDTH+GAPS)
     v:resize(o.width-2*(BWIDTH+GAPS),o.height-2*(BWIDTH+GAPS))
   end
-  OUTPUT:redraw()
   WSP.layout[w] = 2
 end
 
@@ -167,40 +165,55 @@ end
 function M:toggleViewMaximize(view)
   local v = view or WS[WSCUR][0]
   if not v then return end
+  local vx,vy = v:pos()
   local vw,vh = v:size()
   local o = OUTPUT:usable_area()
   local mx = o.x+BWIDTH+GAPS
   local my = o.y+BWIDTH+GAPS
   local mw = o.width-2*(BWIDTH+GAPS)
   local mh = o.height-2*(BWIDTH+GAPS)
-  if vw == mw and vh == mh then
-    v:move(self.ms.x,self.ms.y)
-    v:resize(self.ms.w,self.ms.h)
-  else
-    self.ms.x,self.ms.y = v:pos()
-    self.ms.w,self.ms.h = vw,vh
+
+  if vx ~= mx and vy ~= my and vw ~= mw and vh ~= mh then
+    -- if the view is not maximized then store its dimension
+    -- in M.maximized table
+    self.maximizedViews[v] = {vx,vy,vw,vh}
     v:move(mx,my)
     v:resize(mw,mh)
+  else
+    -- if the view is maximized then restore its original
+    -- dimensions from M.maximized table
+    for i,j in pairs(self.maximizedViews) do
+      if i == v then
+        v:move(j[1],j[2])
+        v:resize(j[3],j[4])
+        -- remove the table entry
+        j = nil
+      end
+    end
   end
-  OUTPUT:redraw()
 end
 
 -- toggle fullscreen view
 function M:toggleViewFullscreen(view)
   local v = view or WS[WSCUR][0]
   if not v then return end
+  local vx,vy = v:pos()
   local vw,vh = v:size()
-  local ow,oh = OUTPUT:size()
-  if vw == ow and vh == oh then
-    v:move(self.fs.x,self.fs.y)
-    v:resize(self.fs.w,self.fs.h)
-  else
-    self.fs.x,self.fs.y = v:pos()
-    self.fs.w,self.fs.h = v:size()
+  local ox,oy,ow,oh = OUTPUT:pos(),OUTPUT:size()
+  if vx ~= ox and vy ~= oy and vw ~= ow and vh ~= oh then
+    self.fullscreenViews[v] = {vx,vy,vw,vh}
     v:move(OUTPUT:pos())
     v:resize(OUTPUT:size())
+  else
+    for i,j in pairs(self.fullscreenViews) do
+      if i == v then
+        v:move(j[1],j[2])
+        v:resize(j[3],j[4])
+        -- remove the table entry
+        j = nil
+      end
+    end
   end
-  OUTPUT:redraw()
 end
 
 return M
