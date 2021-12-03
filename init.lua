@@ -21,7 +21,6 @@ WSP = {  -- workspace properties ; this separtion is to reduce nested table acce
   mwidth = { [1] = 0.52,  [2] = 0.5,  [3] = 0.6,  [-1] = 0.5, },
 }
 WSCUR = 1                 -- holds id of curent workspace
-WSPRV = 1                 -- holds id of previous workspace
 
 OUTPUT = false            -- holds reference to the output
 CURSOR = kiwmi:cursor()   -- holds rference to the cursor

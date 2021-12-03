@@ -1,5 +1,8 @@
 local M = {}
 
+M.wscur = 1
+M.wsprv = 1
+
 local _lt = require('layout')
 
 -- return the position of view in a workspace
@@ -140,18 +143,31 @@ end
 
 -- switch to given workspace
 function M:switchToWorkspace(ws)
+  if ws == WSCUR then return end
   self:hideWorkspace()
-  WSPRV = WSCUR
+  if ws ~= -1 then
+    self.wsprv = self.wscur
+    self.wscur = ws
+  end
   WSCUR = ws
   self:showWorkspace()
   self:focusView()
+end
+
+-- switch to last focused workspace(not hidden space)
+function M:switchToLastWorkspace()
+  if WSCUR == -1 then
+    self:switchToWorkspace(self.wscur)
+  else
+    self:switchToWorkspace(self.wsprv)
+  end
 end
 
 -- switch between hidden space and
 -- current space
 function M:toggleHiddenSpace()
   if WSCUR == -1 then
-    self:switchToWorkspace(WSPRV)
+    self:switchToWorkspace(self.wscur)
   else
     self:switchToWorkspace(-1)
   end

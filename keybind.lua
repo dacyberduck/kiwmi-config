@@ -40,6 +40,7 @@ local keybinds = {
   { true,       false,    false,      true,         '1',        function() _kw:sendViewToWorkspace(1) end },
   { true,       false,    false,      true,         '2',        function() _kw:sendViewToWorkspace(2) end },
   { true,       false,    false,      true,         '3',        function() _kw:sendViewToWorkspace(3) end },
+  { true,       false,    true,       false,        'Tab',      function() _kw:switchToLastWorkspace() end },
 
   { true,       false,    false,      false,        'h',        function() _kw:pushViewToHiddenSpace() end },
   { true,       false,    false,      true,         'h',        function() _kw:popViewFromHiddenSpace() end },
