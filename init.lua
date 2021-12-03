@@ -74,13 +74,14 @@ local keybinds = {
   { true,       false,    false,      true,         'h',        function() _kw:popViewFromHiddenSpace() end },
   { true,       false,    true,       false,        'h',        function() _kw:toggleHiddenSpace() end },
 
-  { false, false, false, false, 'XF86MonBrighnessUp',     function() kiwmi:spawn("xbacklight -inc 5") end },
-  { false, false, false, false, 'XF86MonBrighnessDown',   function() kiwmi:spawn("xbacklight -dec 5") end },
+  { false, false, false, false, 'XF86MonBrightnessUp',    function() kiwmi:spawn("xbacklight -inc 5") end },
+  { false, false, false, false, 'XF86MonBrightnessDown',  function() kiwmi:spawn("xbacklight -dec 5") end },
   { false, false, false, false, 'XF86AudioRaiseVolume',   function() kiwmi:spawn("amixer -D pipewire set Master 5%+") end },
   { false, false, false, false, 'XF86AudioLowerVolume',   function() kiwmi:spawn("amixer -D pipewire set Master 5%-") end },
   { false, false, false, false, 'XF86AudioMute',          function() kiwmi:spawn("amixer set Master toggle") end },
   { false, false, false, false, 'XF86AudioMicMute',       function() kiwmi:spawn("amixer set Capture toggle") end },
   { false, false, false, false, 'Print', function() kiwmi:spawn("grim -t png "..os.getenv("HOME").."/Pictures/screenshot-$(date +%Y-%m-%d-%H-%M-%S).png") end },
+  { true,  false, false, false, 'Print', function() kiwmi:spawn("grim -t png -g \"$(slurp)\" "..os.getenv("HOME").."/Pictures/screenshot-$(date +%Y-%m-%d-%H-%M-%S).png") end },
 }
 
 -- on new output, store it's reference in OUTPUT
