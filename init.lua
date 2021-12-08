@@ -1,7 +1,10 @@
 MODKEY = "Super_L"      -- default modkey for mouse actions
-BWIDTH = 2              -- border width in pixels
-GAPS = 5                -- gaps between edge and views in pixels
-COLORS = { "#4dc653", "#2d4654" }   -- colors for borders and stuff
+BWIDTH = 3              -- border width in pixels
+GAPS = 8                -- gaps between edge and views in pixels
+COLORS = {
+  { "#4dc653", "#2d4654" },
+  { "#d56a55", "#2d5568" },
+}   -- colors for borders and stuff
 WS = {  -- workspaces - tables that holds views per workspace
   -- the behaviour of these tables are like the stack; last in first output
   -- which means; the last view spawned will be at first position and
@@ -38,11 +41,17 @@ end)
 -- initialize keyboard
 kiwmi:on("keyboard", function(keyboard)
   keyboard:on("key_up", function(ev)
-    _modstate = ev.key == MODKEY and false
+    if ev.key == MODKEY then
+      _modstate = false
+      OUTPUT:redraw()
+    end
   end)
 
   keyboard:on("key_down", function(ev)
-    _modstate = ev.key == MODKEY and true
+    if ev.key == MODKEY then
+      _modstate = true
+      OUTPUT:redraw()
+    end
 
     local m = ev.keyboard:modifiers()
     for _,k in ipairs(keybinds) do
@@ -73,6 +82,29 @@ CURSOR:on("button_down", function(button)
   end
 end)
 
+function drawborder(renderer,view,colors)
+  local vx,vy = view:pos()
+  local vw,vh = view:size()
+
+  -- top border
+  renderer:draw_rect(kiwmi:focused_view() == view and colors[1] or colors[2],vx-BWIDTH,vy-BWIDTH,vw+2*BWIDTH,BWIDTH)
+  -- bottom border
+  renderer:draw_rect(kiwmi:focused_view() == view and colors[1] or colors[2],vx-BWIDTH,vy+vh,vw+2*BWIDTH,BWIDTH)
+  -- left border
+  renderer:draw_rect(kiwmi:focused_view() == view and colors[1] or colors[2],vx-BWIDTH,vy,BWIDTH,vh)
+  -- right border
+  renderer:draw_rect(kiwmi:focused_view() == view and colors[1] or colors[2],vx+vw,vy,BWIDTH,vh)
+end
+
+function drawallborders(renderer,views,colors)
+  for _,j in ipairs(views) do
+    if j ~= kiwmi:focused_view() then
+      drawborder(renderer,j,colors)
+    end
+  end
+  drawborder(renderer,kiwmi:focused_view(),colors)
+end
+
 -- on event view
 kiwmi:on("view", function(view)
   -- when a new view is spawned
@@ -86,11 +118,12 @@ kiwmi:on("view", function(view)
   end)
 
   -- render objects before the view is drawn
-  view:on("pre_render", function(ev)
-    local vx,vy = view:pos()
-    local vw,vh = view:size()
-
-    ev.renderer:draw_rect(view == kiwmi:focused_view() and COLORS[1] or COLORS[2], vx-BWIDTH, vy-BWIDTH, vw+2*BWIDTH, vh+2*BWIDTH)
+  view:on("post_render", function(ev)
+    if _modstate then
+      drawallborders(ev.renderer,WS[WSCUR],COLORS[2])
+    else
+      drawborder(ev.renderer,view,COLORS[1])
+    end
   end)
 
   -- when the view request for interactive move
