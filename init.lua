@@ -90,11 +90,7 @@ kiwmi:on("view", function(view)
     local vx,vy = view:pos()
     local vw,vh = view:size()
 
-    if view == kiwmi:focused_view() then
-      ev.renderer:draw_rect(COLORS[1], vx-BWIDTH, vy-BWIDTH, vw+2*BWIDTH, vh+2*BWIDTH)
-    else
-      ev.renderer:draw_rect(COLORS[2], vx-BWIDTH, vy-BWIDTH, vw+2*BWIDTH, vh+2*BWIDTH)
-    end
+    ev.renderer:draw_rect(view == kiwmi:focused_view() and COLORS[1] or COLORS[2], vx-BWIDTH, vy-BWIDTH, vw+2*BWIDTH, vh+2*BWIDTH)
   end)
 
   -- when the view request for interactive move
