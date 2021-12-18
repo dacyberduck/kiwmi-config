@@ -3,7 +3,7 @@ local _lt = require('layout')
 
 local keybinds = {
   -- super -- -- alt -- -- ctrl -- -- shift -- -- -- key -- -- -- action --
-  { true,       false,    false,      false,        'Return',   function() kiwmi:spawn("alacritty") end },
+  { true,       false,    false,      false,        'Return',   function() kiwmi:spawn("footclient") end },
   { true,       false,    false,      false,        'space',    function() kiwmi:spawn("kickoff") end },
   { true,       false,    true,       true,         'q',        function() kiwmi:quit() end },
   { true,       false,    false,      false,        'q',        function() local v = kiwmi:focused_view() if v then v:close() end end },

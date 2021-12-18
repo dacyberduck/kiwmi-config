@@ -1,5 +1,5 @@
 MODKEY = "Super_L"      -- default modkey for mouse actions
-BWIDTH = 3              -- border width in pixels
+BWIDTH = 2              -- border width in pixels
 GAPS = 8                -- gaps between edge and views in pixels
 COLORS = {
   { "#4dc653", "#2d4654" },
@@ -139,5 +139,6 @@ kiwmi:on("view", function(view)
 end)
 
 -- startup programs; this is probably ugly but works
-kiwmi:spawn("swaybg -m fit -i " .. os.getenv("HOME") .. "/Pictures/wallpaper.jpg")
+-- kiwmi:spawn("swaybg -m fit -i " .. os.getenv("HOME") .. "/Pictures/wallpaper.jpg")
+kiwmi:spawn("foot --server 2>/dev/null")
 kiwmi:spawn("pipewire 2>/dev/null")
