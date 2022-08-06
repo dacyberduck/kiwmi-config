@@ -129,7 +129,6 @@ function M:hideWorkspace(ws)
   for _,v in ipairs(WS[w]) do
     v:hide()
   end
-  OUTPUT:redraw()
 end
 
 -- show all views in workspace given or current
@@ -138,7 +137,6 @@ function M:showWorkspace(ws)
   for _,v in ipairs(WS[w]) do
     v:show()
   end
-  OUTPUT:redraw()
 end
 
 -- switch to given workspace

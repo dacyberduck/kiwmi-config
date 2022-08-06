@@ -43,14 +43,12 @@ kiwmi:on("keyboard", function(keyboard)
   keyboard:on("key_up", function(ev)
     if ev.key == MODKEY then
       _modstate = false
-      OUTPUT:redraw()
     end
   end)
 
   keyboard:on("key_down", function(ev)
     if ev.key == MODKEY then
       _modstate = true
-      OUTPUT:redraw()
     end
 
     local m = ev.keyboard:modifiers()
